@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainLayout from "../layout/main-layout/presentation/main-layout.vue";
 import LoginLayout from "../layout/login-layout/presentation/login-layout.vue";
+import RegisterUsers from "../register-users/presentation/register-users.vue";
 
 
 const routes = [
     {
-        path: '/',
+        path: '/home',
         component: MainLayout,
         children: [
             {
@@ -17,6 +18,10 @@ const routes = [
     {
         path: '/login',
         component: LoginLayout
+    },
+    {
+        path: '/register',
+        component: RegisterUsers
     }
 ]
 
