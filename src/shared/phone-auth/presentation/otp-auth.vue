@@ -1,6 +1,10 @@
 <script setup>
 import { MoveLeft } from "lucide-vue-next";
+import InputOtp from 'primevue/inputotp';
 
+import { ref } from 'vue';
+
+const value = ref(null);
 
 </script>
 
@@ -10,17 +14,11 @@ import { MoveLeft } from "lucide-vue-next";
     <h2>Enter cell phone number</h2>
     <p>You must enter your cell phone number to continue.</p>
 
-    <div class="contain-input">
-      <div class="state-location">
-          prefijo<br />
-          +51
-      </div>
-     <div class="input-number">
-       <input type="text" id="input-number" placeholder="Enter the number"></input>
-     </div>
+    <div class="input-otp">
+        <InputOtp v-model="value" />
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <button type="submit" class="button-siguiente">Next</button>
+  <button type="submit" class="button-siguiente">Send</button>
 
   </form>
 </template>
@@ -67,4 +65,7 @@ import { MoveLeft } from "lucide-vue-next";
   border-radius: 0.5rem;
 }
 
+.input-otp {
+    margin: auto;
+}
 </style>
