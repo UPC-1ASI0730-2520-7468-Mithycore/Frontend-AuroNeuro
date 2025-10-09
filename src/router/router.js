@@ -1,9 +1,20 @@
 import { createRouter, createWebHistory } from "vue-router";
-import App from "../App.vue";
-import Navbar from "../shared/presentation/Navbar/Navbar.vue";
+import MainLayout from "../layout/main-layout/presentation/main-layout.vue";
+import LoginLayout from "../layout/login-layout/presentation/login-layout.vue";
 
 
-const routes = []
+const routes = [
+    {
+        path: '/',
+        component: MainLayout,
+        children: [
+            {
+                path: '',
+                component: LoginLayout
+            }
+        ]
+    }
+]
 
 const router = createRouter({
     history: createWebHistory(),
