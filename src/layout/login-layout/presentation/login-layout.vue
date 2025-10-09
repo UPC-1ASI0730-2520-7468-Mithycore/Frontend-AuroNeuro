@@ -1,9 +1,11 @@
 <script setup>
-import { RouterView } from "vue-router";
+ import loginUsers from '../../../login/presentation/login-users.vue';
 </script>
 
 <template>
-  <div>login</div>
+  <login-users />
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

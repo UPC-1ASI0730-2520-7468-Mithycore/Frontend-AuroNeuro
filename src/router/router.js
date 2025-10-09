@@ -13,6 +13,10 @@ const routes = [
                 component: LoginLayout
             }
         ]
+    },
+    {
+        path: '/login',
+        component: LoginLayout
     }
 ]
 
