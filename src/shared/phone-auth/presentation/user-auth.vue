@@ -1,23 +1,29 @@
 <script setup>
 import { MoveLeft } from "lucide-vue-next";
-
+import { FloatLabel } from "primevue";
+import {InputText} from "primevue"
 
 </script>
 
 <template>
   <form class="container-form">
     <MoveLeft />
-    <h2>Enter cell phone number</h2>
-    <p>You must enter your cell phone number to continue.</p>
+    <h2>Enter your details</h2>
+    <p>You need to enter your details so we can identify you to continue.</p>
 
     <div class="contain-input">
-      <div class="state-location">
-          prefijo<br />
-          +51
-      </div>
-     <div class="input-number">
-       <input type="text" id="input-number" placeholder="Enter the number"></input>
-     </div>
+        <label for="Names" class="label-initial">Names</label>
+      <FloatLabel variant="in">
+        <InputText id="Names" v-model="value2" variant="filled" style="width: 100%;"/>
+            <label for="Names">Names</label>
+    </FloatLabel>
+    </div>
+    <div class="contain-input">
+        <label for="Names" class="label-initial">Last Names</label>
+     <FloatLabel variant="in">
+        <InputText id="lastNames" v-model="value2" variant="filled" style="width: 100%;"/>
+            <label for="lastNames">Last Names</label>
+    </FloatLabel>
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
   <button type="submit" class="button-siguiente">Next</button>
@@ -38,7 +44,7 @@ import { MoveLeft } from "lucide-vue-next";
 
 .contain-input {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
   width: 100%;
 }
@@ -60,11 +66,11 @@ import { MoveLeft } from "lucide-vue-next";
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-.state-location {
-  background-color: rgb(220, 218, 218);
-  padding: 0.5rem 2rem;
-  border-radius: 0.5rem;
+.label-initial {
+    padding: 1rem;
+    background-color: rgb(174, 173, 173);
+    border-radius: 0.5rem;
+    width: 40%;
 }
 
 </style>
