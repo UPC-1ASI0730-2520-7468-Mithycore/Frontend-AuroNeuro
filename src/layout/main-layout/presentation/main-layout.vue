@@ -1,6 +1,6 @@
 <script setup>
-import Navbar from "../../../shared/presentation/Navbar/Navbar.vue";
-import Sidebar from "../../../shared/presentation/sidebar/Sidebar.vue";
+import Sidebar from "../../../shared/sidebar/presentation/Sidebar.vue";
+import Navbar from "../../../shared/navbar/presentation/Navbar.vue"
 import { ref } from "vue";
 import { RouterView } from "vue-router";
 
