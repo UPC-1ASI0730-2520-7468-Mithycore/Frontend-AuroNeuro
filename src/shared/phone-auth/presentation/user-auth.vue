@@ -1,35 +1,48 @@
 <script setup>
+import { ref } from "vue";
 import { MoveLeft } from "lucide-vue-next";
-import { FloatLabel } from "primevue";
-import {InputText} from "primevue"
+import FloatLabel from "primevue/floatlabel";
+import InputText from "primevue/inputtext";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
+
+const valueNames = ref("");
+const valueLastNames = ref("");
+
+function handleSubmit() {
+  console.log("Navigating to /home...");
+  router.push("/home");
+}
 </script>
 
 <template>
-  <form class="container-form">
+  <form @submit.prevent="handleSubmit" class="container-form">
     <MoveLeft />
     <h2>Enter your details</h2>
     <p>You need to enter your details so we can identify you to continue.</p>
 
     <div class="contain-input">
-        <label for="Names" class="label-initial">Names</label>
+      <label for="Names" class="label-initial">Names</label>
       <FloatLabel variant="in">
-        <InputText id="Names" v-model="value2" variant="filled" style="width: 100%; background-color: white; color: black;"/>
-            <label for="Names">Names</label>
-    </FloatLabel>
+        <InputText id="Names" v-model="valueNames" variant="filled" style="width: 100%; background-color: white; color: black;" />
+        <label for="Names">Names</label>
+      </FloatLabel>
     </div>
-    <div class="contain-input">
-        <label for="Names" class="label-initial">Last Names</label>
-     <FloatLabel variant="in">
-        <InputText id="lastNames" v-model="value2" variant="filled" style="width: 100%; background-color: white; color: black;"/>
-            <label for="lastNames">Last Names</label>
-    </FloatLabel>
-    </div>
-    <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <button type="submit" class="button-siguiente">Next</button>
 
+    <div class="contain-input">
+      <label for="lastNames" class="label-initial">Last Names</label>
+      <FloatLabel variant="in">
+        <InputText id="lastNames" v-model="valueLastNames" variant="filled" style="width: 100%; background-color: white; color: black;" />
+        <label for="lastNames">Last Names</label>
+      </FloatLabel>
+    </div>
+
+    <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
+    <button type="submit" class="button-siguiente">Next</button>
   </form>
 </template>
+
 
 <style scoped>
 .container-form {

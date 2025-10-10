@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 const isMovile = ref(window.innerWidth < 900)
 
@@ -25,11 +26,11 @@ onUnmounted(()=> {
       <h2>Login</h2>
       <p>Come in and drive your health</p>
       <div class="buttons-options">
-        <button class="button-google">
+        <router-link to="/phone-auth" class="button-google">
           <img src="../../assets/logo-google.svg" />
           Continue with Google
-        </button>
-      <button class="button-phone">Login with cell phone number</button>
+        </router-link>
+      <router-link to="/phone-auth" class="button-phone">Login with cell phone number</router-link>
       <router-link to="/register" class="link-register"> Register </router-link>
       </div>
       <p class="policies">By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
@@ -53,6 +54,7 @@ onUnmounted(()=> {
 .layout-contain-form {
   background-color: white;
 }
+
 
 .layout-contain {
   display: flex;

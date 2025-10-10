@@ -1,6 +1,6 @@
 <script setup>
 import { MoveLeft } from "lucide-vue-next";
-
+import { RouterLink } from "vue-router";
 
 </script>
 
@@ -20,7 +20,7 @@ import { MoveLeft } from "lucide-vue-next";
      </div>
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <button type="submit" class="button-siguiente">Next</button>
+  <router-link to="/otp-auth" type="submit" class="button-siguiente">Next</router-link>
 
   </form>
 </template>

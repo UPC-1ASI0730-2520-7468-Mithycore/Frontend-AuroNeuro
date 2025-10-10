@@ -18,7 +18,7 @@ console.log(props.isOpenSidebar);
       <div class="foto-sidebar"></div>
     </div>
     <div class="buttons-contain">
-      <router-link to="/" class="nav-item" active-class="nav-item-active">
+      <router-link to="/home" class="nav-item" active-class="nav-item-active">
         Home
       </router-link>
 

@@ -1,6 +1,7 @@
 <script setup>
 import { MoveLeft } from "lucide-vue-next";
 import InputOtp from 'primevue/inputotp';
+import { RouterLink } from "vue-router";
 
 import { ref } from 'vue';
 
@@ -18,7 +19,7 @@ const value = ref(null);
         <InputOtp v-model="value" />
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <button type="submit" class="button-siguiente">Send</button>
+  <router-link to="/user-auth" class="button-siguiente">Send</router-link>
 
   </form>
 </template>

@@ -7,6 +7,7 @@ import PrimeVue from "primevue/config";
 // Estilos globales de PrimeVue
 import Material from '@primeuix/themes/material';  
 
+import 'mapbox-gl/dist/mapbox-gl.css'
 import "primeflex/primeflex.css"; 
 import "primeicons/primeicons.css";
 
