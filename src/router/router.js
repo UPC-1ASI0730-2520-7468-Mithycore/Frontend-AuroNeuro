@@ -6,14 +6,9 @@ import UserAuth from "../shared/phone-auth/presentation/user-auth.vue";
 
 const routes = [
     {
-        path: '/home',
+        path: '/',
         component: MainLayout,
-        children: [
-            {
-                path: '',
-                component: LoginLayout
-            }
-        ]
+        
     },
     {
         path: '/login',
@@ -26,7 +21,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes
 })
 
