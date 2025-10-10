@@ -14,14 +14,14 @@ import {InputText} from "primevue"
     <div class="contain-input">
         <label for="Names" class="label-initial">Names</label>
       <FloatLabel variant="in">
-        <InputText id="Names" v-model="value2" variant="filled" style="width: 100%;"/>
+        <InputText id="Names" v-model="value2" variant="filled" style="width: 100%; background-color: white; color: black;"/>
             <label for="Names">Names</label>
     </FloatLabel>
     </div>
     <div class="contain-input">
         <label for="Names" class="label-initial">Last Names</label>
      <FloatLabel variant="in">
-        <InputText id="lastNames" v-model="value2" variant="filled" style="width: 100%;"/>
+        <InputText id="lastNames" v-model="value2" variant="filled" style="width: 100%; background-color: white; color: black;"/>
             <label for="lastNames">Last Names</label>
     </FloatLabel>
     </div>
