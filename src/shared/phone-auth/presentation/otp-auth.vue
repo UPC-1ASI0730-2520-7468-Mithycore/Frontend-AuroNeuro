@@ -1,17 +1,24 @@
 <script setup>
-import { MoveLeft } from "lucide-vue-next";
-import InputOtp from 'primevue/inputotp';
 import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router";
 
 import { ref } from 'vue';
-
+const router = useRouter()
 const value = ref(null);
+
+function goBack() {
+  if (window.history.length > 1) {
+    router.back()
+  }
+}
 
 </script>
 
 <template>
   <form class="container-form">
-    <MoveLeft />
+    <button type="button" style="cursor: pointer;" @click="goBack">
+      <i class="pi pi-arrow-left" style="color: black; text-align: left; width: 100%;"></i>
+    </button>
     <h2>Enter cell phone number</h2>
     <p>You must enter your cell phone number to continue.</p>
 
@@ -19,7 +26,7 @@ const value = ref(null);
         <InputOtp v-model="value" />
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <router-link to="/user-auth" class="button-siguiente">Send</router-link>
+  <router-link to="/user-auth" class="button-next">Send</router-link>
 
   </form>
 </template>
@@ -52,7 +59,9 @@ const value = ref(null);
   border-radius: 0.5rem;
 }
 
-.button-siguiente {
+.button-next {
+  text-decoration: none;
+  text-align: center;
   background-color: #7145D8;
   padding: 1rem;
   border-radius: 0.5rem;
@@ -67,6 +76,6 @@ const value = ref(null);
 }
 
 .input-otp {
-    margin: auto;
+  margin: auto;
 }
 </style>

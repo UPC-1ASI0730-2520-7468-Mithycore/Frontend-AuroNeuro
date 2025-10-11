@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>Bienvenido</div>
+  <div>Bienvenido jhimy romero</div>
 </template>
 
 <style scoped>

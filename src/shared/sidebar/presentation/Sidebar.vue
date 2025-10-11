@@ -5,7 +5,6 @@ const props = defineProps({
   isOpenSidebar: Boolean,
 });
 
-console.log(props.isOpenSidebar);
 </script>
 
 <template>
@@ -15,26 +14,32 @@ console.log(props.isOpenSidebar);
     "
   >
     <div class="contain-foto-sidebar">
-      <div class="foto-sidebar"></div>
+      <img src="https://img.daisyui.com/images/profile/demo/yellingwoman@192.webp" class="foto-sidebar"></img>
     </div>
     <div class="buttons-contain">
       <router-link to="/home" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-home"></i>
         Home
       </router-link>
 
       <router-link to="/data" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-server" style="margin-right: 0.5rem;"></i>
         Data
       </router-link>
       <router-link to="/to" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-user" style="margin-right: 0.5rem;"></i>
         Tu
       </router-link>
       <router-link to="/agenda" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-book" style="margin-right: 0.5rem;"></i>
         Agenda
       </router-link>
       <router-link to="/chats" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-comments" style="margin-right: 0.5rem;"></i>
         Chats
       </router-link>
       <router-link to="/map" class="nav-item" active-class="nav-item-active">
+        <i class="pi pi-map-marker" style="margin-right: 0.5rem;"></i>
         Map
       </router-link>
     </div>
@@ -43,17 +48,22 @@ console.log(props.isOpenSidebar);
 
 <style scoped>
 .sidebar-container-open {
+  position: fixed;
+  width: 100%;
   transform: translateX(0);
   background-color: white;
   height: calc(100vh - 5rem);
   transition: transform 0.1s ease-out;
+  z-index: 50;
 }
 
 .sidebar-container-close {
+  position: fixed;
   transform: translateX(-100%);
   background-color: white;
   height: calc(100vh - 5rem);
   transition: transfirm 0.3s ease-in;
+  z-index: 50;
 }
 
 @media (min-width: 768px) {
@@ -85,7 +95,6 @@ console.log(props.isOpenSidebar);
 }
 
 .foto-sidebar {
-  background-color: aqua;
   width: 7rem;
   height: 7rem;
   border-radius: 50%;
@@ -101,12 +110,13 @@ console.log(props.isOpenSidebar);
 }
 
 .nav-item {
+  align-items: center;
   width: 90%;
   text-decoration: none;
   color: black;
   padding: 1rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
   text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
   box-sizing: border-box;
   border-radius: 0.5rem;
 }

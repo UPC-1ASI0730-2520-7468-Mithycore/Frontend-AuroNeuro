@@ -23,6 +23,11 @@ function handleToggleSidebar(value) {
 </template>
 
 <style scoped>
+
+.main-content {
+  padding: 1rem;
+}
+
 @media (min-width: 768px) {
   .main-content {
     transition: margin-left 0.3s ease-in;

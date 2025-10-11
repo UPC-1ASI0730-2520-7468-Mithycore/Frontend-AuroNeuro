@@ -10,6 +10,7 @@ import Material from '@primeuix/themes/material';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import "primeflex/primeflex.css"; 
 import "primeicons/primeicons.css";
+import { Button, InputOtp } from "primevue";
 
 createApp(App)
     .use(PrimeVue, {
@@ -23,5 +24,7 @@ createApp(App)
     
         }
     })
+    .component("Button", Button)
+    .component("InputOtp", InputOtp)
     .use(router)
     .mount("#app");

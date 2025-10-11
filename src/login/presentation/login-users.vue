@@ -78,6 +78,7 @@ onUnmounted(()=> {
 }
 
 .button-google {
+  text-decoration: none;
   color: black;
   margin-top: 2rem;
   display: flex;
@@ -90,6 +91,8 @@ onUnmounted(()=> {
 }
 
 .button-phone {
+  text-decoration: none;
+  text-align: center;
   background-color: #7145D8;
   color: white;
   padding: 1rem;

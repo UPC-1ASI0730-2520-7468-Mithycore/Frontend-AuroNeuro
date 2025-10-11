@@ -11,14 +11,23 @@ const valueNames = ref("");
 const valueLastNames = ref("");
 
 function handleSubmit() {
-  console.log("Navigating to /home...");
   router.push("/home");
 }
+
+function goBack() {
+  if (window.history.length > 1) {
+    router.back()
+  }
+}
+
+
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit" class="container-form">
-    <MoveLeft />
+    <button type="button" style="cursor: pointer;" @click="goBack">
+      <i class="pi pi-arrow-left" style="color: black; text-align: left; width: 100%;"></i>
+    </button>
     <h2>Enter your details</h2>
     <p>You need to enter your details so we can identify you to continue.</p>
 

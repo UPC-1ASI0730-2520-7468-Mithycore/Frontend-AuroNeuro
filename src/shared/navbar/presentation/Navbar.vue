@@ -1,10 +1,8 @@
 <script setup>
-import { Menu } from "lucide-vue-next";
-import { Bell } from "lucide-vue-next";
-import { EllipsisVertical } from "lucide-vue-next";
-import { onMounted, onUnmounted, ref } from "vue";
+import {  ref } from "vue";
+import { useDevice } from "../../../utils/useDevice";
 
-const isMobile = ref(window.innerWidth < 768);
+const isMobile = useDevice();
 const isOpenSidebar = ref(true);
 
 const emit = defineEmits(["toggle-sidebar"]);
@@ -13,35 +11,23 @@ function handleSidebar() {
   isOpenSidebar.value = !isOpenSidebar.value;
   emit("toggle-sidebar", isOpenSidebar.value);
 }
-
-function handleResize() {
-  isMobile.value = window.innerWidth < 768;
-}
-
-onMounted(() => {
-  window.addEventListener("resize", handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
-});
 </script>
 
 <template>
   <div class="container-navbar">
     <div class="contain-left">
-      <button>
-        <Menu @click="handleSidebar" />
-      </button>
+      <Button icon="pi pi-align-justify" @click="handleSidebar" />
       <h1 class="auro">Auro<span style="color: black">Neuro</span></h1>
     </div>
 
     <div class="contain-right">
-      <button><Bell /></button>
-      <div v-if="!isMobile" class="foto"></div>
+      <button>
+        <i class="pi pi-bell" style="color: black;"></i>
+      </button>
+      <img v-if="!isMobile" src="https://img.daisyui.com/images/profile/demo/yellingwoman@192.webp" class="foto"></img>
       <div v-if="!isMobile">Jhimy romero meza</div>
       <button>
-        <EllipsisVertical />
+        <i class="pi pi-ellipsis-v" style="color: black;"></i>
       </button>
     </div>
   </div>
