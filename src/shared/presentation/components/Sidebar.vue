@@ -42,10 +42,6 @@ const homeLink = computed(() => {
         <i class="pi pi-user" style="margin-right: 0.5rem;"></i>
         Tu
       </router-link>
-      <router-link :to='`${homeLink}/agenda`' class="nav-item" active-class="nav-item-active">
-        <i class="pi pi-book" style="margin-right: 0.5rem;"></i>
-        Agenda
-      </router-link>
       <router-link :to='`${homeLink}/prescription`' class="nav-item" active-class="nav-item-active">
         <i class="pi pi-book" style="margin-right: 0.5rem;"></i>
         prescription

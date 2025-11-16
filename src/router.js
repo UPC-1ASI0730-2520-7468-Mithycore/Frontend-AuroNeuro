@@ -18,7 +18,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     if(to.meta.requiresRole){
-        if('neurologist' === to.meta.requiresRole){
+        if('patient' === to.meta.requiresRole){
             return next();
         }
 
