@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
-import router from "./router/router";
+import router from "./router.js";
 import PrimeVue from "primevue/config";
 
 // Estilos globales de PrimeVue
@@ -11,6 +11,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import "primeflex/primeflex.css"; 
 import "primeicons/primeicons.css";
 import { Button, InputOtp } from "primevue";
+import pinia from "./pinia.js";
 
 createApp(App)
     .use(PrimeVue, {
@@ -27,4 +28,5 @@ createApp(App)
     .component("Button", Button)
     .component("InputOtp", InputOtp)
     .use(router)
+    .use(pinia)
     .mount("#app");
