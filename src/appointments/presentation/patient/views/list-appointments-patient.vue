@@ -7,29 +7,26 @@
     </h2>
 
     <!-- Loading -->
-    <div v-if="loading">
+    <div v-if="store.loading">
       <Skeleton width="100%" height="3rem" class="mb-3" />
       <Skeleton width="100%" height="3rem" class="mb-3" />
       <Skeleton width="100%" height="3rem" />
     </div>
 
     <!-- Empty -->
-    <div v-else-if="appointments.length === 0" class="text-gray-500">
+    <div v-else-if="store.appointments.length === 0" class="text-gray-500">
       No tienes citas registradas.
     </div>
 
     <!-- Appointments -->
-    <div v-else class="grid gap-3">
-      <Card v-for="a in appointments" :key="a.id" class="shadow-sm border-round cursor-pointer"
-            @click="goToDetails(a.id)">
-        <template #title>
-          {{ a.date }}
-        </template>
+    <div v-else>
+      <h1 class="font-bold text-lg mb-4">
+        Detalle de la cita
+      </h1>
 
-        <template #content>
-          <p><strong>Estado:</strong> {{ a.status }}</p>
-        </template>
-      </Card>
+      <div v-for="a in store.appointments" :key="a.id" class="mb-4 p-3 border rounded">
+        <p><strong>Notas:</strong> {{ store.notes }}</p>
+      </div>
     </div>
 
   </div>
@@ -41,10 +38,10 @@ import { useRouter } from "vue-router";
 import { usePatientAppointments } from "../../../application/patient/appointments.storage.js";
 
 const router = useRouter();
-const { appointments, loadAppointments, loading } = usePatientAppointments();
+const store = usePatientAppointments();
 
 onMounted(() => {
-  loadAppointments();
+  store.getAppointmentById(1);
 });
 
 function goToDetails(id) {

@@ -1,13 +1,15 @@
-import axios from "axios";
+import {BaseApi} from "../../../shared/infrastructure/base-api.js";
+import {BaseEndpoint} from "../../../shared/infrastructure/base-endpoint.js";
 
-const API_URL = "http://localhost:5152/api/v1";
+export class HomeApi extends BaseApi{
+    #appointmentEndpoint
 
-export async function fetchPatientAppointments(patientId) {
-    const response = await axios.get(`${API_URL}/patients/${patientId}/appointments`);
-    return response.data;
-}
+    constructor() {
+        super();
+        this.#appointmentEndpoint = new BaseEndpoint(this,"/appointment")
+    }
 
-export async function fetchPatientAppointmentById(appointmentId) {
-    const response = await axios.get(`${API_URL}/appointments/${appointmentId}`);
-    return response.data;
+    getAppointmentById(id) {
+        return this.#appointmentEndpoint.getById(id);
+    }
 }

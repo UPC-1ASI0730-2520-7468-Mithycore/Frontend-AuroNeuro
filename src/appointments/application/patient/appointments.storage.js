@@ -7,22 +7,25 @@ import {
 const appointments = ref([]);
 const appointment = ref(null);
 
-// 🔥 ID temporal quemado (hasta que tengas login funcionando)
+
 const PATIENT_ID = 1;
 
 export function usePatientAppointments() {
-    async function loadAppointments() {
-        appointments.value = await fetchPatientAppointments(PATIENT_ID);
-    }
+    //state
+    const appointment = ref([])
 
-    async function loadAppointment(appointmentId) {
-        appointment.value = await fetchPatientAppointmentById(appointmentId);
+
+    //Actions
+    function getAppointmentById(id) {
+        homeApi.getAppointmentById(id).then(response => {
+            const result = response.data;
+            console.log(result);
+            appointment.value = result;
+        })
     }
 
     return {
-        appointments,
         appointment,
-        loadAppointments,
-        loadAppointment
-    };
+        getAppointmentById
+    }
 }
