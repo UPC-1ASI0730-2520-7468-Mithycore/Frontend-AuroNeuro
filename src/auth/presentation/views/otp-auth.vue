@@ -35,25 +35,12 @@ function goBack() {
 .container-form {
   display: flex;
   flex-direction: column;
-  margin: auto;
   max-width: 25rem;
   gap: 1rem;
-  margin-top: 5rem;
+  margin: 5rem auto auto;
   padding: 0.5rem;
 }
 
-.contain-input {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.input-number {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
 .input-number input{
   height: 3rem;
   border-radius: 0.5rem;

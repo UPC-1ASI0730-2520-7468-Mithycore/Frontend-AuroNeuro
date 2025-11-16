@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from "vue";
-import { MoveLeft } from "lucide-vue-next";
 import FloatLabel from "primevue/floatlabel";
 import InputText from "primevue/inputtext";
 import { useRouter } from "vue-router";
