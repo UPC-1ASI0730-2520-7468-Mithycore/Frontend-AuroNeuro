@@ -18,12 +18,12 @@
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
-    "vue": "^3.4.27",
+    "vue": "3.4.27",
     "vue-chartjs": "^5.2.0",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "5.0.4",
-    "vite": "6.0.5"
+    "vite": "5.2.10"
   }
 }
