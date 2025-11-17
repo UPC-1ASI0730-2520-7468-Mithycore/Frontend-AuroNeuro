@@ -46,6 +46,7 @@ const homeLink = computed(() => {
         <i class="pi pi-book" style="margin-right: 0.5rem;"></i>
         prescription
       </router-link>
+
       <router-link :to='`${homeLink}/appointments`' class="nav-item" active-class="nav-item-active">
         <i class="pi pi-comments" style="margin-right: 0.5rem;"></i>
         appointments
