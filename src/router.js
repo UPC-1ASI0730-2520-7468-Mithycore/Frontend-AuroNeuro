@@ -6,6 +6,7 @@ import {NeurologistRoutes} from "./neurologist-routes.js";
 const routes = [
     ...NeurologistRoutes,
     ...PatientRoutes,
+    { path: '/', redirect: '/auth/login'},
     { path: '/auth',  children: authRoutes},
 
 ]

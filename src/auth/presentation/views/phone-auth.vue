@@ -31,7 +31,7 @@ function goBack() {
      </div>
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <router-link to="/otp-auth" type="submit" class="button-next">Next</router-link>
+  <router-link to="/auth/otp-auth" type="submit" class="button-next">Next</router-link>
 
   </form>
 </template>

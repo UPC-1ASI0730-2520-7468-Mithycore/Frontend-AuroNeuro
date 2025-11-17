@@ -26,7 +26,7 @@ function goBack() {
         <InputOtp v-model="value" />
     </div>
     <p>By continuing, you agree to AuraNeuro's Privacy Policy and Terms of Use.</p>
-  <router-link to="/user-auth" class="button-next">Send</router-link>
+  <router-link to="/auth/user-auth" class="button-next">Send</router-link>
 
   </form>
 </template>
