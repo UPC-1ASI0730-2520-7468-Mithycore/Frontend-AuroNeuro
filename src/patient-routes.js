@@ -3,7 +3,10 @@ import HomePatientRoutes from "./dashboard/presentation/patient/home-patient-rou
 import PrescriptionPatientRoutes from "./prescription/presentation/patient/prescription-patient-routes.js";
 
 import DataRoutesPatient from "./neurological-evaluations/presentation/patient/evaluations-routes-patient.js";
-import MapRoutes from "./location/presentation/map-routes.js";
+import MapRoutes from "./location/presentation/neurologist/map-routes-neurologist.js";
+import AppointmentRoutesPatient from "./appointments/presentation/patient/appointments-routes-patient.js";
+import ProfileRoutesPatient from "./profile/presentation/patient/profile-routes-patient.js";
+import MapRoutesPatient from "./location/presentation/patient/map-routes-patient.js";
 
 export const PatientRoutes = [
     {
@@ -13,8 +16,10 @@ export const PatientRoutes = [
         children: [
             ...HomePatientRoutes,
             ...DataRoutesPatient,
-            ...MapRoutes,
-            ...PrescriptionPatientRoutes
+            ...MapRoutesPatient,
+            ...PrescriptionPatientRoutes,
+            ...AppointmentRoutesPatient,
+            ...ProfileRoutesPatient
         ]
     }
 ]

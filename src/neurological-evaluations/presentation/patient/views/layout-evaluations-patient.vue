@@ -1,9 +1,10 @@
 <script setup>
 
+import WelcomeUser from "../components/welcome-user.vue";
 </script>
 
 <template>
-  <h1>hello data</h1>
+  <welcome-user/>
 </template>
 
 <style scoped>

@@ -1,8 +1,7 @@
 import PrescriptionList from "./views/PrescriptionList.vue";
 
-export default [
-    {
-        path: "prescription",
-        component: PrescriptionList,
-    },
+const PrescriptionsRoutesPatient= [
+    {path: 'prescription', component: PrescriptionList},
 ];
+
+export default PrescriptionsRoutesPatient;

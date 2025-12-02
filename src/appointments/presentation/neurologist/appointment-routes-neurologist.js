@@ -1,7 +1,7 @@
 import LayoutAppointmentNeurologist from "./views/layout-appointment-neurologist.vue";
 
-const AppointmentRoutes = [
+const AppointmentRoutesNeurologist = [
     {path: 'appointments', component: LayoutAppointmentNeurologist}
 ]
 
-export default AppointmentRoutes;
+export default AppointmentRoutesNeurologist;

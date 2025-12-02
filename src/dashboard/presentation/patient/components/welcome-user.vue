@@ -4,8 +4,9 @@ import DoughnutGraphic from "./doughnut-graphic.vue";
 import RadarChartsGraphic from "./radar-charts-graphic.vue";
 import PieChartsGraphic from "./pie-charts-graphic.vue";
 import LineChartsGraphic from "./line-charts-graphic.vue";
-import { useHomeStorage } from "../../../application/patient/home.storage.js";
-import { useIamApi } from "../../../../iam/application/iam.storage.js";
+import {useIamApi} from "../../../../iam/application/iam.storage.js";
+import {useHomeStorage} from "../../../application/patient/home.storage.js";
+
 
 const store = useHomeStorage();
 const storeIam = useIamApi();

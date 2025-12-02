@@ -2,9 +2,10 @@ import HomeNeurologistRoutes from "./dashboard/presentation/neurologist/home-neu
 import MainLayout from "./shared/presentation/components/main-layout.vue";
 import PrescriptionNeurologistRoutes from "./prescription/presentation/neurologist/prescription-neurologist-routes.js";
 import ProfileNeurologistRoutes from "./profile/presentation/neurologist/profile-neurologist.js";
-import AppointmentRoutes from "./appointments/presentation/neurologist/appointment-routes.js";
+import AppointmentRoutesNeurologist from "./appointments/presentation/neurologist/appointment-routes-neurologist.js";
 import EvaluationsRoutesNeurologist
     from "./neurological-evaluations/presentation/neurologist/evaluations-routes-neurologist.js";
+import MapRoutesNeurologist from "./location/presentation/neurologist/map-routes-neurologist.js";
 
 export const NeurologistRoutes = [
     {
@@ -14,8 +15,9 @@ export const NeurologistRoutes = [
             ...HomeNeurologistRoutes,
             ...PrescriptionNeurologistRoutes,
             ...ProfileNeurologistRoutes,
-            ...AppointmentRoutes,
-            ...EvaluationsRoutesNeurologist
+            ...AppointmentRoutesNeurologist,
+            ...EvaluationsRoutesNeurologist,
+            ...MapRoutesNeurologist
         ],
         meta: { requiresRole: "Neurologist" },
     },
