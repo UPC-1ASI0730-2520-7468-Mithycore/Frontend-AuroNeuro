@@ -6,8 +6,15 @@ import DataRoutesPatient from "./data/presentation/patient/data-routes-patient.j
 import MapRoutes from "./location/presentation/map-routes.js";
 
 export const PatientRoutes = [
-    {path: '/patient', component: MainLayout, children: HomePatientRoutes, meta: {requiresRole: 'patient'}},
-    {path: '/patient', component: MainLayout, children: DataRoutesPatient, meta: {requiresRole: 'patient'}},
-    {path: '/patient', component: MainLayout, children: MapRoutes, meta: {requiresRole: 'patient'}},
-    {path: '/patient', component: MainLayout, children: PrescriptionPatientRoutes, meta: {requiresRole: 'patient'}}
+    {
+        path: "/patient",
+        component: MainLayout,
+        meta: { requiresRole: "Patient"},
+        children: [
+            ...HomePatientRoutes,
+            ...DataRoutesPatient,
+            ...MapRoutes,
+            ...PrescriptionPatientRoutes
+        ]
+    }
 ]

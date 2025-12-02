@@ -13,8 +13,8 @@ const route = useRoute()
 const homeLink = computed(() => {
   const role = route.meta.requiresRole
 
-  if (role === 'patient') return '/patient'
-  if (role === 'neurologist') return '/neurologist'
+  if (role === 'Patient') return '/patient'
+  if (role === 'Neurologist') return '/neurologist'
 
 })
 

@@ -12,6 +12,7 @@
     "@primeuix/themes": "^1.2.5",
     "axios": "^1.13.2",
     "chart.js": "^4.5.1",
+    "firebase": "^12.6.0",
     "lucide-vue-next": "^0.545.0",
     "mapbox-gl": "^2.15.0",
     "pinia": "^3.0.4",

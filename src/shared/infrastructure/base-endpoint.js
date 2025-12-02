@@ -1,3 +1,4 @@
+
 export class BaseEndpoint {
     http
     endpointPath
@@ -8,7 +9,9 @@ export class BaseEndpoint {
     }
 
     getAll(){
-        return this.http.get(this.endpointPath);
+        return this.http.get(this.endpointPath, {
+            withCredentials: true,
+        });
     }
 
     getById(id) {
@@ -16,7 +19,9 @@ export class BaseEndpoint {
     }
 
     create(resource) {
-        return this.http.post(this.endpointPath);
+        return this.http.post(this.endpointPath, resource, {
+            withCredentials: true,
+        });
     }
 
     update(id, resource) {

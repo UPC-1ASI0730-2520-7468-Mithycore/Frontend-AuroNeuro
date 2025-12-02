@@ -6,7 +6,7 @@ export class BaseApi {
     #http
 
     constructor() {
-        this.#http = axios.create({baseURL: baseUrl})
+        this.#http = axios.create({baseURL: baseUrl, withCredentials: true})
     }
 
     get http() {
