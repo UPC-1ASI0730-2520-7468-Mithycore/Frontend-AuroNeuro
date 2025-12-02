@@ -11,6 +11,7 @@ export const useHomeStorage = defineStore('home', () => {
 
     //Actions
     function getNeuroAssessmentById(id) {
+        console.log(id)
         homeApi.getNeuroAssessmentById(id).then(response => {
             const result = response.data;
             console.log(result);
@@ -18,9 +19,22 @@ export const useHomeStorage = defineStore('home', () => {
         })
     }
 
+    async function createNeuroAssessment(resource) {
+        const result = await homeApi.createNeuroAssessment(resource)
+        console.log(result.data);
+
+    }
+
+    async function assignNeurologistToPatient(id, resource) {
+        const result = await homeApi.addNeurologistIdToPatient(id, resource);
+        console.log(result.data)
+    }
+
     return {
         neuroAssessment,
-        getNeuroAssessmentById
+        getNeuroAssessmentById,
+        createNeuroAssessment,
+        assignNeurologistToPatient
     }
 
 })

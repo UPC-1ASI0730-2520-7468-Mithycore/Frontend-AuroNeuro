@@ -1,56 +1,29 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 import { useIamApi } from "../../../../iam/application/iam.storage.js";
+import { useHomeStorage } from "../../../application/patient/home.storage.js";
 
 const store = useIamApi();
+const storeHome = useHomeStorage();
 
-// Datos de demo (luego los sustituyes por API real)
+/* ----------------------------
+   DATA DE DEMO
+----------------------------- */
 const recentPrescriptions = ref([
-  {
-    id: 1,
-    patientName: "Juan Pérez",
-    createdAt: "2025-11-21",
-    diagnosis: "Migraine",
-    medication: "Sumatriptan 50mg",
-  },
-  {
-    id: 2,
-    patientName: "María García",
-    createdAt: "2025-11-20",
-    diagnosis: "Epilepsy",
-    medication: "Levetiracetam 500mg",
-  },
-  {
-    id: 3,
-    patientName: "Luis Gómez",
-    createdAt: "2025-11-18",
-    diagnosis: "Sleep disorder",
-    medication: "Melatonin 3mg",
-  },
+  { id: 1, patientName: "Juan Pérez", createdAt: "2025-11-21", diagnosis: "Migraine", medication: "Sumatriptan 50mg" },
+  { id: 2, patientName: "María García", createdAt: "2025-11-20", diagnosis: "Epilepsy", medication: "Levetiracetam 500mg" },
+  { id: 3, patientName: "Luis Gómez", createdAt: "2025-11-18", diagnosis: "Sleep disorder", medication: "Melatonin 3mg" },
 ]);
 
 const patients = ref([
-  {
-    id: 101,
-    name: "Juan Pérez",
-    lastVisit: "2025-11-21",
-    condition: "Migraine",
-  },
-  {
-    id: 102,
-    name: "María García",
-    lastVisit: "2025-11-19",
-    condition: "Epilepsy",
-  },
-  {
-    id: 103,
-    name: "Luis Gómez",
-    lastVisit: "2025-11-15",
-    condition: "Sleep disorder",
-  },
+  { id: 101, name: "Juan Pérez", lastVisit: "2025-11-21", condition: "Migraine" },
+  { id: 102, name: "María García", lastVisit: "2025-11-19", condition: "Epilepsy" },
+  { id: 103, name: "Luis Gómez", lastVisit: "2025-11-15", condition: "Sleep disorder" },
 ]);
 
-// Iniciales a partir de store.user.fullName
+/* ----------------------------
+   INICIALES DEL USUARIO
+----------------------------- */
 const initials = computed(() => {
   const fullName = store.user?.fullName ?? "";
   if (!fullName) return "N";
@@ -58,6 +31,145 @@ const initials = computed(() => {
   const first = parts[0]?.charAt(0) ?? "";
   const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
   return (first + last).toUpperCase();
+});
+
+/* ----------------------------
+   MODAL PARA ASIGNAR PACIENTE
+----------------------------- */
+const showAddPatientModal = ref(false);
+const newPatientId = ref("");
+const isSubmittingPatient = ref(false);
+const addPatientError = ref(null);
+
+async function addPatient() {
+  addPatientError.value = null;
+
+  if (!newPatientId.value) {
+    addPatientError.value = "Patient ID is required.";
+    return;
+  }
+  storeHome.assignNeurologistToPatient(newPatientId.value, {
+    neurologistId: store.user.id
+  });
+}
+
+/* ----------------------------
+   MODAL NUEVO NEURO ASSESSMENT
+----------------------------- */
+const showNeuroModal = ref(false);
+const isSubmittingNeuro = ref(false);
+const neuroError = ref(null);
+
+const neuroForm = ref({
+  patientId: "",
+  gaitScore: 0,
+  balanceScore: 0,
+  reflexScore: 0,
+  cognitionScore: 0,
+  memoryScore: 0,
+  speechScore: 0,
+  tremorScore: 0,
+  strengthScore: 0,
+  coordinationScore: 0,
+  sensoryScore: 0,
+  eegSummary: "",
+  neurologistNotes: "",
+  isFlagged: false,
+  alertLevel: 0,
+});
+
+// Abre el modal desde el botón
+function addNewNeuroAssessment() {
+  neuroError.value = null;
+  showNeuroModal.value = true;
+}
+
+// Envía el formulario al backend
+async function submitNeuroAssessment() {
+  neuroError.value = null;
+
+  if (!neuroForm.value.patientId) {
+    neuroError.value = "Patient ID is required.";
+    return;
+  }
+
+  try {
+    isSubmittingNeuro.value = true;
+
+    const payload = {
+      patientId: Number(neuroForm.value.patientId),
+      neurologistId: store.user?.id ?? 0,
+      gaitScore: Number(neuroForm.value.gaitScore),
+      balanceScore: Number(neuroForm.value.balanceScore),
+      reflexScore: Number(neuroForm.value.reflexScore),
+      cognitionScore: Number(neuroForm.value.cognitionScore),
+      memoryScore: Number(neuroForm.value.memoryScore),
+      speechScore: Number(neuroForm.value.speechScore),
+      tremorScore: Number(neuroForm.value.tremorScore),
+      strengthScore: Number(neuroForm.value.strengthScore),
+      coordinationScore: Number(neuroForm.value.coordinationScore),
+      sensoryScore: Number(neuroForm.value.sensoryScore),
+      eegSummary: neuroForm.value.eegSummary,
+      neurologistNotes: neuroForm.value.neurologistNotes,
+      isFlagged: Boolean(neuroForm.value.isFlagged),
+      alertLevel: Number(neuroForm.value.alertLevel),
+    };
+
+    await storeHome.createNeuroAssessment(payload);
+
+    // Reset
+    showNeuroModal.value = false;
+    neuroForm.value = {
+      patientId: "",
+      gaitScore: 0,
+      balanceScore: 0,
+      reflexScore: 0,
+      cognitionScore: 0,
+      memoryScore: 0,
+      speechScore: 0,
+      tremorScore: 0,
+      strengthScore: 0,
+      coordinationScore: 0,
+      sensoryScore: 0,
+      eegSummary: "",
+      neurologistNotes: "",
+      isFlagged: false,
+      alertLevel: 0,
+    };
+  } catch (err) {
+    console.error(err);
+    neuroError.value =
+        err?.response?.data?.message || err?.message || "Could not create neuro assessment.";
+  } finally {
+    isSubmittingNeuro.value = false;
+  }
+}
+
+/* ----------------------------
+   BLOQUEAR SCROLL DEL FONDO + ESC
+----------------------------- */
+const anyModalOpen = computed(() => showAddPatientModal.value || showNeuroModal.value);
+
+function onKeydown(e) {
+  if (e.key === "Escape") {
+    if (showNeuroModal.value) showNeuroModal.value = false;
+    if (showAddPatientModal.value) showAddPatientModal.value = false;
+  }
+}
+
+watch(anyModalOpen, (open) => {
+  if (open) {
+    document.body.classList.add("no-scroll");
+    window.addEventListener("keydown", onKeydown, { passive: true });
+  } else {
+    document.body.classList.remove("no-scroll");
+    window.removeEventListener("keydown", onKeydown);
+  }
+});
+
+onUnmounted(() => {
+  document.body.classList.remove("no-scroll");
+  window.removeEventListener("keydown", onKeydown);
 });
 </script>
 
@@ -109,22 +221,20 @@ const initials = computed(() => {
               {{ store.loading ? "Loading..." : "Welcome back," }}
             </p>
             <h1 class="top-title">
-              {{
-                store.loading || !store.user
-                    ? "Neurologist"
-                    : "Dr. " + store.user.fullName
-              }}
+              {{ store.loading || !store.user ? "Neurologist" : "Dr. " + store.user.fullName }}
             </h1>
           </div>
 
           <div class="top-actions">
-            <button class="btn-pill">
-              New prescription
-            </button>
-            <button class="btn-outline">
+            <button class="btn-pill">New prescription</button>
+
+            <!-- BOTÓN QUE ABRE EL MODAL DE PACIENTE -->
+            <button class="btn-outline" @click="showAddPatientModal = true">
               Add patient
             </button>
-            <button class="btn-outline">
+
+            <!-- BOTÓN QUE ABRE EL MODAL DE NEURO ASSESSMENT -->
+            <button class="btn-outline" @click="addNewNeuroAssessment">
               New Neuro Assessment
             </button>
           </div>
@@ -135,29 +245,19 @@ const initials = computed(() => {
           <section class="card">
             <div class="card-header">
               <h2>Recent prescriptions</h2>
-              <button class="link-small">
-                View all
-              </button>
+              <button class="link-small">View all</button>
             </div>
             <div class="card-body">
               <ul class="list">
-                <li
-                    v-for="rx in recentPrescriptions"
-                    :key="rx.id"
-                    class="list-item"
-                >
+                <li v-for="rx in recentPrescriptions" :key="rx.id" class="list-item">
                   <div class="list-main">
-                    <p class="list-title">
-                      {{ rx.medication }}
-                    </p>
+                    <p class="list-title">{{ rx.medication }}</p>
                     <p class="list-subtitle">
                       {{ rx.diagnosis }} • {{ rx.patientName }}
                     </p>
                   </div>
                   <div class="list-meta">
-                    <span class="pill pill-light">
-                      {{ rx.createdAt }}
-                    </span>
+                    <span class="pill pill-light">{{ rx.createdAt }}</span>
                   </div>
                 </li>
               </ul>
@@ -168,9 +268,7 @@ const initials = computed(() => {
           <section class="card">
             <div class="card-header">
               <h2>My patients</h2>
-              <button class="link-small">
-                View all
-              </button>
+              <button class="link-small">View all</button>
             </div>
             <div class="card-body">
               <table class="table">
@@ -188,9 +286,7 @@ const initials = computed(() => {
                   <td>{{ p.lastVisit }}</td>
                   <td>{{ p.condition }}</td>
                   <td class="table-actions">
-                    <button class="link-small">
-                      Open record
-                    </button>
+                    <button class="link-small">Open record</button>
                   </td>
                 </tr>
                 </tbody>
@@ -224,6 +320,172 @@ const initials = computed(() => {
         </section>
       </main>
     </div>
+
+    <!-- -------------------------
+         MODAL: ADD PATIENT
+    -------------------------- -->
+    <div
+        v-if="showAddPatientModal"
+        class="modal-backdrop"
+        @click.self="showAddPatientModal = false"
+    >
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-patient-title">
+        <header class="modal-header">
+          <h3 id="add-patient-title">Add Patient</h3>
+          <button class="close" @click="showAddPatientModal = false">✕</button>
+        </header>
+
+        <main class="modal-body">
+          <label class="field">
+            <span>Patient ID:</span>
+            <input
+                v-model="newPatientId"
+                type="number"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="Enter patient ID"
+                class="input"
+            />
+          </label>
+
+          <p v-if="addPatientError" class="error-msg">{{ addPatientError }}</p>
+        </main>
+
+        <footer class="modal-footer">
+          <button class="btn" type="button" @click="showAddPatientModal = false">
+            Cancel
+          </button>
+          <button class="btn btn-primary" :disabled="isSubmittingPatient" @click="addPatient" type="button">
+            {{ isSubmittingPatient ? "Assigning..." : "Assign Patient" }}
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- -------------------------
+         MODAL: NEW NEURO ASSESSMENT
+    -------------------------- -->
+    <div
+        v-if="showNeuroModal"
+        class="modal-backdrop"
+        @click.self="showNeuroModal = false"
+    >
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="neuro-modal-title">
+        <header class="modal-header">
+          <h3 id="neuro-modal-title">New Neuro Assessment</h3>
+          <button class="close" @click="showNeuroModal = false">✕</button>
+        </header>
+
+        <main class="modal-body">
+          <!-- Patient ID (fila completa) -->
+          <div class="field">
+            <span>Patient ID</span>
+            <input
+                v-model="neuroForm.patientId"
+                type="number"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="Enter patient ID"
+                class="input"
+            />
+          </div>
+
+          <hr style="margin: 0.75rem 0" />
+
+          <!-- GRID DE DOS COLUMNAS PARA LOS SCORES -->
+          <div class="field-grid">
+            <div class="field">
+              <span>Gait score</span>
+              <input v-model.number="neuroForm.gaitScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Balance score</span>
+              <input v-model.number="neuroForm.balanceScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Reflex score</span>
+              <input v-model.number="neuroForm.reflexScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Cognition score</span>
+              <input v-model.number="neuroForm.cognitionScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Memory score</span>
+              <input v-model.number="neuroForm.memoryScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Speech score</span>
+              <input v-model.number="neuroForm.speechScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Tremor score</span>
+              <input v-model.number="neuroForm.tremorScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Strength score</span>
+              <input v-model.number="neuroForm.strengthScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Coordination score</span>
+              <input v-model.number="neuroForm.coordinationScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+
+            <div class="field">
+              <span>Sensory score</span>
+              <input v-model.number="neuroForm.sensoryScore" type="number" min="0" max="10" step="1" class="input" />
+            </div>
+          </div>
+
+          <!-- CAMPOS DE TEXTO (fila completa) -->
+          <div class="field">
+            <span>EEG summary</span>
+            <textarea v-model="neuroForm.eegSummary" rows="2" class="input" style="resize: vertical"></textarea>
+          </div>
+
+          <div class="field">
+            <span>Neurologist notes</span>
+            <textarea v-model="neuroForm.neurologistNotes" rows="3" class="input" style="resize: vertical"></textarea>
+          </div>
+
+          <div class="field" style="margin-top: 0.5rem">
+            <label style="display: flex; align-items: center; gap: 0.5rem">
+              <input type="checkbox" v-model="neuroForm.isFlagged" />
+              <span>Flag as alert</span>
+            </label>
+          </div>
+
+          <div class="field">
+            <span>Alert level</span>
+            <input v-model.number="neuroForm.alertLevel" type="number" min="0" max="3" step="1" class="input" />
+          </div>
+
+          <p v-if="neuroError" class="error-msg">{{ neuroError }}</p>
+        </main>
+
+        <footer class="modal-footer">
+          <button class="btn" type="button" @click="showNeuroModal = false">
+            Cancel
+          </button>
+          <button
+              class="btn btn-primary"
+              :disabled="isSubmittingNeuro"
+              @click="submitNeuroAssessment"
+              type="button"
+          >
+            {{ isSubmittingNeuro ? "Saving..." : "Save assessment" }}
+          </button>
+        </footer>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -236,7 +498,7 @@ const initials = computed(() => {
   align-items: stretch;
   padding: 1.5rem;
   box-sizing: border-box;
-  background: #f5f5f7; /* fondo gris muy suave */
+  background: #f5f5f7;
 }
 
 /* GRID GENERAL */
@@ -376,6 +638,7 @@ const initials = computed(() => {
   gap: 0.5rem;
 }
 
+/* BUTTONS */
 .btn-pill {
   border: none;
   border-radius: 999px;
@@ -409,13 +672,14 @@ const initials = computed(() => {
   background: #f3f4f6;
 }
 
-/* GRID CARDS */
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
+/* CARDS */
 .card {
   background: #ffffff;
   border-radius: 1rem;
@@ -440,15 +704,6 @@ const initials = computed(() => {
   margin: 0;
   font-size: 1rem;
   color: #111827;
-}
-
-.link-small {
-  border: none;
-  background: transparent;
-  color: #3b82f6;
-  font-size: 0.8rem;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 /* LIST */
@@ -494,12 +749,6 @@ const initials = computed(() => {
   align-items: center;
 }
 
-.pill {
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.75rem;
-}
-
 .pill-light {
   background: #eff6ff;
   color: #1d4ed8;
@@ -530,16 +779,6 @@ const initials = computed(() => {
   background: #f9fafb;
 }
 
-.table-actions {
-  text-align: right;
-}
-
-.empty {
-  margin-top: 0.7rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
 /* OVERVIEW */
 .overview-grid {
   display: grid;
@@ -557,41 +796,135 @@ const initials = computed(() => {
 .stat-label {
   font-size: 0.75rem;
   color: #9ca3af;
-  margin: 0 0 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .stat-value {
-  margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #111827;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  .dashboard-shell {
-    grid-template-columns: 1fr;
-  }
+/* -------------------------------
+     MODAL STYLES
+--------------------------------*/
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
 
-  .main {
-    order: -1;
+/* Modal flexible + altura limitada */
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  width: min(640px, 95vw);
+  max-height: 90vh;             /* nunca supera la pantalla */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;             /* esconder overflow externo */
+  animation: modalIn 0.2s ease-out;
+
+  display: flex;                /* header - body - footer en columna */
+  flex-direction: column;
+}
+
+@keyframes modalIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;               /* no se comprime */
+}
+
+.modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;               /* no se comprime */
+}
+
+/* solo el cuerpo hace scroll */
+.modal-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  overscroll-behavior: contain; /* evita "arrastrar" scroll al fondo */
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  padding: 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.close {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+/* Botones genéricos de modal */
+.btn {
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+/* GRID de 2 columnas para los scores */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1rem;
+  row-gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Responsive: en pantallas muy pequeñas, 1 columna */
+@media (max-width: 480px) {
+  .field-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 700px) {
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .top-actions {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .overview-grid {
-    grid-template-columns: 1fr;
-  }
+/* Bloquear scroll del body cuando un modal está abierto */
+:global(body.no-scroll) {
+  overflow: hidden;
 }
 </style>

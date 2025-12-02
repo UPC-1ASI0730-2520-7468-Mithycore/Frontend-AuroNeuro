@@ -5,62 +5,50 @@ import RadarChartsGraphic from "./radar-charts-graphic.vue";
 import PieChartsGraphic from "./pie-charts-graphic.vue";
 import LineChartsGraphic from "./line-charts-graphic.vue";
 import { useHomeStorage } from "../../../application/patient/home.storage.js";
+import { useIamApi } from "../../../../iam/application/iam.storage.js";
 
 const store = useHomeStorage();
+const storeIam = useIamApi();
+
+// Evaluación cargada desde el store de paciente
 const record = computed(() => store.neuroAssessment?.[0] ?? null);
 
-// 👉 Aquí podrías también tener store.patient si haces otra llamada a la API
-// const patient = computed(() => store.patient ?? null);
+// Paciente logueado desde IAM (lo que cargaste en validateSession)
+const patient = computed(() => storeIam.user ?? null);
 
-// Cargar el registro al montar
 onMounted(() => {
-  // Ajusta el id según necesites (por route param, por ejemplo)
-  // Aquí se consulta a la base de datos para obtener la evaluación (y posiblemente datos del paciente)
-  store.getNeuroAssessmentById(1);
-
-  // Si tuvieras un método separado para solo datos del paciente:
-  // store.getPatientById(1);
+  // Aquí se consulta a la base de datos para obtener la evaluación
+  // (ajusta el id según lo que recibas por route params, etc.)
+  store.getNeuroAssessmentById(patient.value.id);
 });
 
-/* Nombre e info del paciente basados en el record */
-const patientName = computed(() => {
-  // ajusta estas propiedades según tu DTO real
-  return (
-      record.value?.patient?.fullName ||
-      `${record.value?.patient?.firstName ?? ""} ${record.value?.patient?.lastName ?? ""}`.trim() ||
-      record.value?.name ||
-      "Sin nombre"
-  );
-});
-
-const patientId = computed(() => {
-  return record.value?.patient?.id ?? record.value?.patientId ?? record.value?.id ?? null;
-});
-
-const patientAge = computed(() => {
-  // si en tu API viene como edad directa, úsala:
-  if (record.value?.patient?.age != null) return record.value.patient.age;
-
-  // si viene fecha de nacimiento, puedes calcularla en otro momento
-  return null;
-});
-
+// Fecha de última evaluación
 const lastEvaluationDate = computed(() => {
   return record.value?.lastEvaluationDate || record.value?.createdAt || null;
 });
 
+// Iniciales del paciente
 const patientInitials = computed(() => {
+  // 1) intentar desde el user logueado
+  const fullName = patient.value?.fullName;
+  if (fullName) {
+    const parts = fullName.trim().split(/\s+/);
+    const first = parts[0]?.charAt(0) ?? "";
+    const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
+    const initials = (first + last).toUpperCase();
+    if (initials) return initials;
+  }
+
+  // 2) fallback a nombre que venga dentro del record
   const p = record.value?.patient;
-  const n = record.value?.name;
   if (p?.firstName || p?.lastName) {
     return (
         (p.firstName?.charAt(0) ?? "") +
         (p.lastName?.charAt(0) ?? "")
     ).toUpperCase() || "P";
   }
-  if (typeof n === "string" && n.length > 0) {
-    return n.charAt(0).toUpperCase();
-  }
+
+  // 3) fallback final
   return "P";
 });
 
@@ -93,10 +81,7 @@ function closeModal() {
 
 function submitReport() {
   const text = (reportText.value || "").trim();
-  if (!text) {
-    // aquí puedes mostrar un toast
-    return;
-  }
+  if (!text) return;
 
   emit("report-help", {
     recordId: record.value?.id ?? null,
@@ -158,11 +143,15 @@ function submitReport() {
 
       <div class="patient-info">
         <h2 class="patient-name">
-          {{ patientName }}
+          {{ patient?.fullName ?? "Paciente" }}
         </h2>
         <p class="patient-meta">
-          <span v-if="patientId">ID Paciente: <strong>#{{ patientId }}</strong></span>
-          <span v-if="patientAge != null"> • Edad: <strong>{{ patientAge }}</strong></span>
+          <span v-if="patient?.id">
+            ID Paciente: <strong>#{{ patient.id }}</strong>
+          </span>
+          <span v-if="patient?.email">
+            • Email: <strong>{{ patient.email }}</strong>
+          </span>
         </p>
         <p class="patient-meta" v-if="lastEvaluationDate">
           Última evaluación: <strong>{{ lastEvaluationDate }}</strong>
@@ -170,7 +159,7 @@ function submitReport() {
       </div>
     </section>
 
-    <!-- Evaluaciones agrupadas: cada par tiene un título -->
+    <!-- Evaluaciones agrupadas -->
     <section class="evaluation-group">
       <h2 class="group-title">Evaluación Motora</h2>
 
@@ -320,9 +309,11 @@ function submitReport() {
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  background: rgba(255,255,255,0.8);
+  /* Fondo ligeramente azulado para que destaque sobre blanco */
+  background: linear-gradient(90deg, #eef2ff, #e0f2fe);
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+  color: #0f172a; /* fuerza texto oscuro dentro del bloque */
 }
 
 .patient-avatar {
@@ -347,13 +338,18 @@ function submitReport() {
 .patient-name {
   margin: 0;
   font-size: 16px;
-  color: #0b1220;
+  color: #111827; /* título bien oscuro */
 }
 
 .patient-meta {
   margin: 0;
   font-size: 12px;
-  color: var(--muted);
+  color: #6b7280; /* gris suave para detalles */
+}
+
+.patient-summary,
+.patient-summary * {
+  color: #0f172a !important;
 }
 
 /* Buttons */

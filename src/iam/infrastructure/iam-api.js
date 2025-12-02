@@ -33,5 +33,11 @@ export class IamApi extends BaseApi{
         })
     }
 
+    getPatientById(id) {
+        return this.http.get(`/patients/${id}`, {
+            withCredentials: true
+        })
+    }
+
 
 }

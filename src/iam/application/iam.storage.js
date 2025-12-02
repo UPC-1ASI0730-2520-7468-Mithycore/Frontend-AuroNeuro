@@ -20,23 +20,43 @@ export const useIamApi = defineStore('iam', () => {
         try {
             // 1. Validar sesión
             const { data: session } = await iamApi.validate(); // GET /validate
-            // session -> { userId, role } según tu comentario
+            // session -> { userId, role }
 
             if (!session || !session.userId) {
                 throw new Error("Sesión inválida: no se encontró userId");
             }
 
-            // 2. Traer datos del neurólogo
-            const { data: neurologist } = await iamApi.getNeurologistById(session.userId);
-            user.value = neurologist;
+            let profile = null;
 
-            console.log("Usuario neurologist cargado:", user.value);
+            // 2. Si es neurólogo
+            if (session.role === 'Neurologist') {
+                const { data } = await iamApi.getNeurologistById(session.userId);
+                profile = data;
+                console.log("Usuario neurologist cargado:", profile);
+            }
 
-            // Puedes devolver más info si quieres
+            // 3. Si es paciente
+            else if (session.role === 'Patient') {
+                const { data } = await iamApi.getPatientById(session.userId);
+                profile = data;
+                console.log("Usuario patient cargado:", profile);
+            }
+
+            // 4. Rol no soportado
+            else {
+                throw new Error("Rol desconocido: " + session.role);
+            }
+
+            // Guardar perfil + rol en el store
+            user.value = {
+                ...profile,
+                role: session.role
+            };
+
             return {
                 ok: true,
-                user: neurologist,
-                role: session.role ?? null,
+                user: user.value,
+                role: session.role
             };
 
         } catch (e) {
@@ -44,24 +64,22 @@ export const useIamApi = defineStore('iam', () => {
 
             user.value = null;
 
-            // Si viene de axios, normalmente e.response.status existe
             const status = e?.response?.status;
-
             if (status === 401) {
                 error.value = "Sesión expirada. Inicia sesión nuevamente.";
             } else {
-                error.value = "Sesión no válida o error al validar.";
+                error.value = "No fue posible validar la sesión.";
             }
 
             return {
                 ok: false,
-                error: error.value,
+                error: error.value
             };
-
         } finally {
             loading.value = false;
         }
     }
+
 
     // 2) Login con username/password/role
     async function signIn(resource) {
@@ -86,7 +104,7 @@ export const useIamApi = defineStore('iam', () => {
 
             if (role === "Patient") {
                 await router.push("/patient/dashboard");
-            } else if (role === "neurologist") {
+            } else if (role === "Neurologist") {
                 await router.push("/neurologist/dashboard");
             }
 
@@ -122,7 +140,7 @@ export const useIamApi = defineStore('iam', () => {
 
             if (role === "Patient") {
                 await router.push("/patient/dashboard");
-            } else if (role === "neurologist") {
+            } else if (role === "Neurologist") {
                 await router.push("/neurologist/dashboard");
             }
 

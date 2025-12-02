@@ -12,6 +12,20 @@ export class HomeApi extends BaseApi{
     }
 
     getNeuroAssessmentById(id) {
-        return this.#neuroAssessmentEndpoint.getById(id);
+        return this.http.get(`/neuro-assessment/patient/${id}`, {
+            withCredentials: true
+        })
+    }
+
+    createNeuroAssessment(resource) {
+        return this.http.post('/neuro-assessment', resource, {
+            withCredentials: true
+        })
+    }
+
+    addNeurologistIdToPatient(id, resource) {
+        return this.http.post(`/patients/${id}/neurologists`, resource, {
+            withCredentials: true
+        })
     }
 }
