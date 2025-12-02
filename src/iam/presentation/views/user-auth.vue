@@ -10,7 +10,7 @@ const valueNames = ref("");
 const valueLastNames = ref("");
 
 function handleSubmit() {
-  router.push("/patient/home");
+  router.push("/patient/dashboard");
 }
 
 function goBack() {

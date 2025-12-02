@@ -1,8 +1,8 @@
 import MainLayout from "./shared/presentation/components/main-layout.vue";
-import HomePatientRoutes from "./home/presentation/patient/home-patient-routes.js";
+import HomePatientRoutes from "./dashboard/presentation/patient/home-patient-routes.js";
 import PrescriptionPatientRoutes from "./prescription/presentation/patient/prescription-patient-routes.js";
 
-import DataRoutesPatient from "./data/presentation/patient/data-routes-patient.js";
+import DataRoutesPatient from "./neurological-evaluations/presentation/patient/evaluations-routes-patient.js";
 import MapRoutes from "./location/presentation/map-routes.js";
 
 export const PatientRoutes = [

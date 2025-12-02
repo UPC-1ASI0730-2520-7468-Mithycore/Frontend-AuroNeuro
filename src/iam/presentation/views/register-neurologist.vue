@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
-import {useIamApi} from "../../application/sign-in.storage.js";
+import {useIamApi} from "../../application/iam.storage.js";
 
 const router = useRouter();
 const store = useIamApi()
@@ -9,7 +9,7 @@ const store = useIamApi()
 const form = reactive({
   username: "",
   password: "",
-  role: "Neurologist",
+  role: "neurologist",
   firstName: "",
   lastName: "",
   licenseNumber: "",
@@ -70,7 +70,7 @@ async function handleSubmit() {
     specialties: form.specialties,
   };
 
-  console.log("Payload Neurologist para API:", payload);
+  console.log("Payload neurologist para API:", payload);
 
   // TODO: llamada real a tu API
   // await api.post("/neurologists", payload)

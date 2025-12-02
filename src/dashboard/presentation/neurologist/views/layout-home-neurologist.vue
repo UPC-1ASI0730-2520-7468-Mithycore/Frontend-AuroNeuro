@@ -1,16 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
-// import axios from "axios"; // si usas axios
+import { ref, computed } from "vue";
+import { useIamApi } from "../../../../iam/application/iam.storage.js";
 
-// Aquí puedes obtener el id del usuario logueado
-// por ejemplo desde localStorage, pinia, jwt, etc.
-const neurologistId = ref(1); // <-- reemplaza por lo real
+const store = useIamApi();
 
-const neurologist = ref(null);
-const isLoading = ref(true);
-const error = ref(null);
-
-// Datos de ejemplo (hasta que conectes API)
+// Datos de demo (luego los sustituyes por API real)
 const recentPrescriptions = ref([
   {
     id: 1,
@@ -56,77 +50,42 @@ const patients = ref([
   },
 ]);
 
+// Iniciales a partir de store.user.fullName
 const initials = computed(() => {
-  if (!neurologist.value) return "N";
-  const { firstName, lastName } = neurologist.value;
-  return (
-      (firstName?.charAt(0) || "") + (lastName?.charAt(0) || "")
-  ).toUpperCase();
-});
-
-const fullName = computed(() => {
-  if (!neurologist.value) return "";
-  return `${neurologist.value.firstName} ${neurologist.value.lastName}`;
-});
-
-async function loadNeurologist() {
-  try {
-    isLoading.value = true;
-    error.value = null;
-
-    // 🔗 Ejemplo de llamada a tu API .NET
-    // const { data } = await axios.get(`/api/neurologists/${neurologistId.value}`);
-    // neurologist.value = data;
-
-    // Mientras tanto, mock:
-    neurologist.value = {
-      id: neurologistId.value,
-      firstName: "Carlos",
-      lastName: "Ramírez",
-      email: "c.ramirez@auraneuro.com",
-      licenseNumber: "CMP-12345",
-      role: "Neurologist",
-      city: "Lima",
-      country: "Peru",
-    };
-  } catch (e) {
-    console.error(e);
-    error.value = "Error loading neurologist data";
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-onMounted(() => {
-  loadNeurologist();
+  const fullName = store.user?.fullName ?? "";
+  if (!fullName) return "N";
+  const parts = fullName.trim().split(/\s+/);
+  const first = parts[0]?.charAt(0) ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
+  return (first + last).toUpperCase();
 });
 </script>
 
 <template>
   <div class="dashboard-page">
     <div class="dashboard-shell">
-      <!-- Sidebar / Profile simple -->
+      <!-- Sidebar / Profile -->
       <aside class="sidebar">
-        <div class="profile-card" v-if="!isLoading && neurologist">
+        <div class="profile-card" v-if="!store.loading && store.user">
           <div class="avatar">
             <span>{{ initials }}</span>
           </div>
-          <h2 class="name">{{ fullName }}</h2>
-          <p class="role">{{ neurologist.role || "Neurologist" }}</p>
+          <h2 class="name">{{ store.user.fullName }}</h2>
+          <p class="role">Neurologist</p>
 
           <div class="profile-info">
             <div class="info-item">
               <span class="label">Email</span>
-              <span class="value">{{ neurologist.email }}</span>
+              <span class="value">{{ store.user.email }}</span>
             </div>
             <div class="info-item">
               <span class="label">License</span>
-              <span class="value">{{ neurologist.licenseNumber }}</span>
+              <span class="value">{{ store.user.licenseNumber }}</span>
             </div>
-            <div class="info-item" v-if="neurologist.city || neurologist.country">
-              <span class="label">Location</span>
+            <div class="info-item">
+              <span class="label">Clinic</span>
               <span class="value">
-                {{ neurologist.city }}{{ neurologist.country ? ', ' + neurologist.country : '' }}
+                {{ store.user.clinicAddress || "No info" }}
               </span>
             </div>
           </div>
@@ -147,10 +106,14 @@ onMounted(() => {
         <header class="top-bar">
           <div>
             <p class="welcome">
-              {{ isLoading ? 'Loading...' : 'Welcome back,' }}
+              {{ store.loading ? "Loading..." : "Welcome back," }}
             </p>
             <h1 class="top-title">
-              {{ isLoading ? 'Neurologist' : 'Dr. ' + fullName }}
+              {{
+                store.loading || !store.user
+                    ? "Neurologist"
+                    : "Dr. " + store.user.fullName
+              }}
             </h1>
           </div>
 
@@ -160,6 +123,9 @@ onMounted(() => {
             </button>
             <button class="btn-outline">
               Add patient
+            </button>
+            <button class="btn-outline">
+              New Neuro Assessment
             </button>
           </div>
         </header>
@@ -262,6 +228,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* PAGE */
 .dashboard-page {
   min-height: 100vh;
   display: flex;
@@ -269,8 +236,10 @@ onMounted(() => {
   align-items: stretch;
   padding: 1.5rem;
   box-sizing: border-box;
+  background: #f5f5f7; /* fondo gris muy suave */
 }
 
+/* GRID GENERAL */
 .dashboard-shell {
   max-width: 1200px;
   width: 100%;
@@ -279,17 +248,18 @@ onMounted(() => {
   gap: 1.5rem;
 }
 
-/* Sidebar / profile */
+/* SIDEBAR */
 .sidebar {
   display: flex;
 }
 
 .profile-card {
-  background: #0d0d16;
-  color: #f5f5ff;
-  border-radius: 1.5rem;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 1.25rem;
   padding: 1.5rem;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -306,12 +276,13 @@ onMounted(() => {
   width: 4rem;
   height: 4rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, #7145d8, #9c5bff);
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 1.4rem;
+  color: white;
 }
 
 .name {
@@ -320,8 +291,8 @@ onMounted(() => {
 }
 
 .role {
-  font-size: 0.85rem;
-  color: #bcbce8;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 
 .profile-info {
@@ -341,7 +312,7 @@ onMounted(() => {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #8b8bb8;
+  color: #9ca3af;
 }
 
 .value {
@@ -351,32 +322,35 @@ onMounted(() => {
 .btn-profile {
   margin-top: auto;
   align-self: flex-start;
-  padding: 0.55rem 1rem;
+  padding: 0.45rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid #3b3b66;
+  border: 1px solid #cbd5e1;
   font-size: 0.8rem;
-  color: #f5f5ff;
+  color: #1f2933;
   text-decoration: none;
-  transition: 0.2s;
+  transition: 0.15s;
+  background: #ffffff;
 }
 
 .btn-profile:hover {
-  background: #1b1b2f;
-  border-color: #7145d8;
+  background: #eff6ff;
+  border-color: #3b82f6;
 }
 
-/* Main */
+/* MAIN */
 .main {
-  background: #05050a;
-  border-radius: 1.5rem;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
   padding: 1.5rem;
-  color: #f5f5ff;
+  color: #0f172a;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
 
+/* TOP BAR */
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -388,12 +362,13 @@ onMounted(() => {
 .welcome {
   margin: 0;
   font-size: 0.85rem;
-  color: #bcbce8;
+  color: #6b7280;
 }
 
 .top-title {
   margin: 0.2rem 0 0;
   font-size: 1.4rem;
+  color: #111827;
 }
 
 .top-actions {
@@ -405,36 +380,36 @@ onMounted(() => {
   border: none;
   border-radius: 999px;
   padding: 0.6rem 1.1rem;
-  background: linear-gradient(135deg, #7145d8, #9c5bff);
+  background: linear-gradient(90deg, #3b82f6, #06b6d4);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 10px 25px rgba(90, 54, 185, 0.6);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
   transition: 0.15s;
 }
 
 .btn-pill:hover {
   transform: translateY(-1px);
-  box-shadow: 0 13px 30px rgba(90, 54, 185, 0.8);
+  box-shadow: 0 14px 26px rgba(59, 130, 246, 0.35);
 }
 
 .btn-outline {
   border-radius: 999px;
   padding: 0.6rem 1.1rem;
-  background: transparent;
-  border: 1px solid #3b3b66;
-  color: #f5f5ff;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #111827;
   font-size: 0.85rem;
   cursor: pointer;
   transition: 0.15s;
 }
 
 .btn-outline:hover {
-  background: #18182a;
+  background: #f3f4f6;
 }
 
-/* Grid */
+/* GRID CARDS */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -442,12 +417,13 @@ onMounted(() => {
 }
 
 .card {
-  background: #0d0d18;
-  border-radius: 1.2rem;
+  background: #ffffff;
+  border-radius: 1rem;
   padding: 1rem 1rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+  border: 1px solid #e5e7eb;
 }
 
 .card.full {
@@ -463,18 +439,19 @@ onMounted(() => {
 .card-header h2 {
   margin: 0;
   font-size: 1rem;
+  color: #111827;
 }
 
 .link-small {
   border: none;
   background: transparent;
-  color: #9c88ff;
+  color: #3b82f6;
   font-size: 0.8rem;
   cursor: pointer;
   text-decoration: underline;
 }
 
-/* List */
+/* LIST */
 .list {
   list-style: none;
   padding: 0;
@@ -491,7 +468,7 @@ onMounted(() => {
   align-items: center;
   padding: 0.55rem 0.4rem;
   border-radius: 0.6rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: #f9fafb;
 }
 
 .list-main {
@@ -503,12 +480,13 @@ onMounted(() => {
 .list-title {
   margin: 0;
   font-size: 0.9rem;
+  color: #111827;
 }
 
 .list-subtitle {
   margin: 0;
   font-size: 0.8rem;
-  color: #bcbce8;
+  color: #6b7280;
 }
 
 .list-meta {
@@ -523,11 +501,11 @@ onMounted(() => {
 }
 
 .pill-light {
-  background: rgba(156, 136, 255, 0.15);
-  color: #e0dcff;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
-/* Table */
+/* TABLE */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -544,12 +522,12 @@ onMounted(() => {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #9b9bcc;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.01);
+  background: #f9fafb;
 }
 
 .table-actions {
@@ -559,10 +537,10 @@ onMounted(() => {
 .empty {
   margin-top: 0.7rem;
   font-size: 0.8rem;
-  color: #9b9bcc;
+  color: #9ca3af;
 }
 
-/* Overview */
+/* OVERVIEW */
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -571,14 +549,14 @@ onMounted(() => {
 }
 
 .stat {
-  background: rgba(255, 255, 255, 0.02);
+  background: #f9fafb;
   border-radius: 0.9rem;
   padding: 0.7rem 0.8rem;
 }
 
 .stat-label {
   font-size: 0.75rem;
-  color: #9b9bcc;
+  color: #9ca3af;
   margin: 0 0 0.2rem;
 }
 
@@ -586,9 +564,10 @@ onMounted(() => {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
+  color: #111827;
 }
 
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .dashboard-shell {
     grid-template-columns: 1fr;

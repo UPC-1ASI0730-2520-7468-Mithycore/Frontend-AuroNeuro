@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref, onMounted, onBeforeUnmount } from "vue";
-import {useIamApi} from "../../application/sign-in.storage.js";
+import {useIamApi} from "../../application/iam.storage.js";
 
 // estado del formulario
 const form = reactive({

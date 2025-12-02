@@ -1,7 +1,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
-import {useIamApi} from "../../application/sign-in.storage.js";
+import {useIamApi} from "../../application/iam.storage.js";
 
 const router = useRouter();
 const store = useIamApi();

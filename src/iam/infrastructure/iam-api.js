@@ -27,5 +27,11 @@ export class IamApi extends BaseApi{
         })
     }
 
+    getNeurologistById(id) {
+        return this.http.get(`/neurologists/${id}`, {
+            withCredentials: true
+        })
+    }
+
 
 }

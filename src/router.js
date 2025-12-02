@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 import authRoutes from "./iam/presentation/auth-routes.js";
 import {PatientRoutes} from "./patient-routes.js";
 import {NeurologistRoutes} from "./neurologist-routes.js";
-import {useIamApi} from "./iam/application/sign-in.storage.js";
+import {useIamApi} from "./iam/application/iam.storage.js";
 
 const routes = [
     ...NeurologistRoutes,
@@ -24,12 +24,12 @@ router.beforeEach(async (to, from, next) => {
         return next();
     }
 
-    const ok = await iamStore.validateSession();
-    if(!ok){
+    const request = await iamStore.validateSession();
+    if(!request.ok){
         return next("/iam/login");
     }
 
-    const userRole = iamStore.user.role;
+    const userRole = request.role;
     const requiredRole = to.meta.requiresRole;
 
     if(userRole === requiredRole){
@@ -37,7 +37,6 @@ router.beforeEach(async (to, from, next) => {
     }
 
     return next("iam/login")
-
 
 })
 

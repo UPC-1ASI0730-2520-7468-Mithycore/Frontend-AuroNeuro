@@ -9,10 +9,59 @@ import { useHomeStorage } from "../../../application/patient/home.storage.js";
 const store = useHomeStorage();
 const record = computed(() => store.neuroAssessment?.[0] ?? null);
 
+// 👉 Aquí podrías también tener store.patient si haces otra llamada a la API
+// const patient = computed(() => store.patient ?? null);
+
 // Cargar el registro al montar
 onMounted(() => {
-  // Ajusta el id según necesites
+  // Ajusta el id según necesites (por route param, por ejemplo)
+  // Aquí se consulta a la base de datos para obtener la evaluación (y posiblemente datos del paciente)
   store.getNeuroAssessmentById(1);
+
+  // Si tuvieras un método separado para solo datos del paciente:
+  // store.getPatientById(1);
+});
+
+/* Nombre e info del paciente basados en el record */
+const patientName = computed(() => {
+  // ajusta estas propiedades según tu DTO real
+  return (
+      record.value?.patient?.fullName ||
+      `${record.value?.patient?.firstName ?? ""} ${record.value?.patient?.lastName ?? ""}`.trim() ||
+      record.value?.name ||
+      "Sin nombre"
+  );
+});
+
+const patientId = computed(() => {
+  return record.value?.patient?.id ?? record.value?.patientId ?? record.value?.id ?? null;
+});
+
+const patientAge = computed(() => {
+  // si en tu API viene como edad directa, úsala:
+  if (record.value?.patient?.age != null) return record.value.patient.age;
+
+  // si viene fecha de nacimiento, puedes calcularla en otro momento
+  return null;
+});
+
+const lastEvaluationDate = computed(() => {
+  return record.value?.lastEvaluationDate || record.value?.createdAt || null;
+});
+
+const patientInitials = computed(() => {
+  const p = record.value?.patient;
+  const n = record.value?.name;
+  if (p?.firstName || p?.lastName) {
+    return (
+        (p.firstName?.charAt(0) ?? "") +
+        (p.lastName?.charAt(0) ?? "")
+    ).toUpperCase() || "P";
+  }
+  if (typeof n === "string" && n.length > 0) {
+    return n.charAt(0).toUpperCase();
+  }
+  return "P";
 });
 
 /* emits para que el padre maneje la lógica real */
@@ -43,11 +92,10 @@ function closeModal() {
 }
 
 function submitReport() {
-  // Validación mínima
   const text = (reportText.value || "").trim();
   if (!text) {
-    // Puedes reemplazar esto por tu propio toast/alert
-    // console.warn("Ingrese una descripción para el reporte");
+    // aquí puedes mostrar un toast
+    return;
   }
 
   emit("report-help", {
@@ -68,8 +116,7 @@ function submitReport() {
       <div class="title-wrap">
         <h1 class="app-title">Panel de Evaluaciones Neurológicas</h1>
         <p class="subtitle">
-          Visualización de resultados por evaluación — paciente:
-          <strong>{{ record?.name ?? "Sin nombre" }}</strong>
+          Visualización de resultados por evaluación
         </p>
       </div>
 
@@ -102,6 +149,26 @@ function submitReport() {
         </button>
       </div>
     </header>
+
+    <!-- 🧍‍♂️ Resumen / ficha del paciente -->
+    <section class="patient-summary" aria-label="Información del paciente">
+      <div class="patient-avatar">
+        <span>{{ patientInitials }}</span>
+      </div>
+
+      <div class="patient-info">
+        <h2 class="patient-name">
+          {{ patientName }}
+        </h2>
+        <p class="patient-meta">
+          <span v-if="patientId">ID Paciente: <strong>#{{ patientId }}</strong></span>
+          <span v-if="patientAge != null"> • Edad: <strong>{{ patientAge }}</strong></span>
+        </p>
+        <p class="patient-meta" v-if="lastEvaluationDate">
+          Última evaluación: <strong>{{ lastEvaluationDate }}</strong>
+        </p>
+      </div>
+    </section>
 
     <!-- Evaluaciones agrupadas: cada par tiene un título -->
     <section class="evaluation-group">
@@ -183,7 +250,11 @@ function submitReport() {
         <main class="modal-body">
           <label class="field">
             <span>Descripción:</span>
-            <textarea v-model="reportText" rows="4" placeholder="Describe por qué se necesita ayuda..."></textarea>
+            <textarea
+                v-model="reportText"
+                rows="4"
+                placeholder="Describe por qué se necesita ayuda..."
+            ></textarea>
           </label>
 
           <label class="field small">
@@ -226,7 +297,7 @@ function submitReport() {
   gap: 16px;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .title-wrap { flex: 1 1 auto; }
@@ -240,6 +311,49 @@ function submitReport() {
   margin: 4px 0 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+/* 🧍‍♂️ patient summary */
+.patient-summary {
+  margin: 12px 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+}
+
+.patient-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.patient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.patient-name {
+  margin: 0;
+  font-size: 16px;
+  color: #0b1220;
+}
+
+.patient-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 /* Buttons */
@@ -318,7 +432,6 @@ function submitReport() {
   align-items: center;
   justify-content: center;
   padding: 6px;
-  /* ensure charts fit nicely */
 }
 
 /* Modal */
@@ -362,5 +475,9 @@ function submitReport() {
   .grid { grid-template-columns: 1fr; }
   .topbar { flex-direction: column; align-items: stretch; gap: 12px; }
   .actions { justify-content: flex-start; }
+  .patient-summary {
+    flex-direction: row;
+    align-items: center;
+  }
 }
 </style>
