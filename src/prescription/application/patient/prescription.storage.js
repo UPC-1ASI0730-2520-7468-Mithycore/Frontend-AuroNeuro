@@ -1,14 +1,53 @@
 import {
     fetchPrescriptionsByPatient,
     fetchPrescriptionsByNeurologist,
-} from "../../infrastructure/patient/prescription-api";
+    fetchPrescriptionById,
+    createPrescriptionApi,
+    updatePrescriptionMedicinesApi,
+    deletePrescriptionApi,
+} from "../../infrastructure/patient/prescription-api.js";
 
-export const PrescriptionStorage = {
-    async getPatientPrescriptions(patientId) {
-        return await fetchPrescriptionsByPatient(patientId);
-    },
+export class PrescriptionStorage {
+    static async getPatientPrescriptions(patientId) {
+        return fetchPrescriptionsByPatient(patientId);
+    }
 
-    async getNeurologistPrescriptions(neurologistId) {
-        return await fetchPrescriptionsByNeurologist(neurologistId);
-    },
-};
+    static async getNeurologistPrescriptions(neurologistId) {
+        return fetchPrescriptionsByNeurologist(neurologistId);
+    }
+
+    static async getById(prescriptionId) {
+        return fetchPrescriptionById(prescriptionId);
+    }
+
+    static async create({ patientId, neurologistId, medicines }) {
+        const issuedAt = new Date().toISOString();
+
+        const payload = {
+            patientId,
+            neurologistId,
+            issuedAt,
+            medicines: medicines.map((m) => ({
+                name: m.name,
+                dosage: m.dosage,
+                frequency: m.frequency,
+            })),
+        };
+
+        return createPrescriptionApi(payload);
+    }
+
+    static async updateMedicines(prescriptionId, medicines) {
+        const normalized = medicines.map((m) => ({
+            name: m.name,
+            dosage: m.dosage,
+            frequency: m.frequency,
+        }));
+
+        return updatePrescriptionMedicinesApi(prescriptionId, normalized);
+    }
+
+    static async delete(prescriptionId) {
+        return deletePrescriptionApi(prescriptionId);
+    }
+}

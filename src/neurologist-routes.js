@@ -10,6 +10,6 @@ export const NeurologistRoutes = [
             ...HomeNeurologistRoutes,
             ...PrescriptionNeurologistRoutes,
         ],
-        meta: { requiresRole: "Neurologist" },
+        meta: { requiresRole: "neurologist" },
     },
 ];

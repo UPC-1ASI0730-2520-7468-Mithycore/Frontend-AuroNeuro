@@ -18,27 +18,27 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach(async (to, from, next) => {
-    const iamStore = useIamApi();
-    if(!to.meta.requiresRole){
-        return next();
-    }
+//router.beforeEach(async (to, from, next) => {
+//    const iamStore = useIamApi();
+//    if(!to.meta.requiresRole){
+//        return next();
+//    }
 
-    const ok = await iamStore.validateSession();
-    if(!ok){
-        return next("/iam/login");
-    }
+//    const ok = await iamStore.validateSession();
+//    if(!ok){
+//        return next("/iam/login");
+//    }
 
-    const userRole = iamStore.user.role;
-    const requiredRole = to.meta.requiresRole;
+//   const userRole = iamStore.user.role;
+//   const requiredRole = to.meta.requiresRole;
 
-    if(userRole === requiredRole){
-        return next();
-    }
+//    if(userRole === requiredRole){
+//       return next();
+//    }
 
-    return next("iam/login")
+//    return next("iam/login")
 
 
-})
+//})
 
 export default router;
